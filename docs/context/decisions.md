@@ -5,6 +5,28 @@ alternatives were considered. Newest entries at the top.
 
 ---
 
+## 2026-11-23 — Added a null-control baseline; transfer results are now read against a noise floor, not 0%
+
+**Decision:** Added `src/null_control.py` and `docs/null-control.md`. Transfer shares are
+now compared with each model's noise floor, defined as the max prophetic share across
+three noise conditions (uniform word salad, frequency-weighted word salad and shuffled
+verses), and with a KJV base rate from untouched random verses. Pericopes are tested with
+a one-sided exact binomial test against the floor, with Bonferroni correction across 12.
+
+**Why:** Every earlier result implicitly treated 0% as chance. Measured, the floor is
+0.23-0.37, so several "partial transfer" readings were at noise level. The idea came from
+TempleOS's random-word oracle, a well-known human case of finding prophecy in noise, used
+here as a machine test. The project still measures style only.
+
+**Alternatives considered:** Using 1/3 (uniform-prior chance) as the floor. Rejected:
+the classifier's priors and feature distributions aren't uniform, so 1/3 is no better a
+guess than 0. Taking the floor from frequency-weighted salad only. Rejected in favor of
+the max across conditions, which is more conservative. Retraining the models with a
+fourth "noise" class. Rejected: that would change the models being evaluated rather than
+measure them.
+
+---
+
 ## 2026-07-22 — Excluded 1 Enoch 1:9 from all analysis, at the project owner's direction
 
 **Decision:** 1 Enoch 1:9 — the verse Jude 1:14-15 quotes — is excluded from every

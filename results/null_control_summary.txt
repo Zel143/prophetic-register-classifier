@@ -1,0 +1,110 @@
+Null-control baseline (n=1000 per condition, seed=143)
+
+--- full model: predicted-label mix per condition ---
+pred_full           law-wisdom  narrative  prophetic
+condition                                           
+word_salad_uniform       0.912      0.021      0.067
+word_salad_freq          0.269      0.412      0.319
+verse_shuffle            0.243      0.412      0.345
+random_verse             0.242      0.363      0.395
+  noise floor (max over noise conditions): 0.345
+  KJV base rate (random_verse):            0.395
+  1_enoch            0.359 prophetic  (+0.014 vs floor, -0.036 vs base rate)
+  bahman_yasht       0.224 prophetic  (-0.121 vs floor, -0.171 vs base rate)
+  sibylline_oracles  0.313 prophetic  (-0.032 vs floor, -0.082 vs base rate)
+  hand-picked pericopes vs floor (one-sided exact binomial, H0: p = 0.345):
+    1_enoch            ch10_judgment                  14/25  = 0.56  p=0.0224  *
+    1_enoch            ch14_throne_vision              8/26  = 0.31  p=0.7228
+    1_enoch            ch1_theophany                   7/10  = 0.70  p=0.0240  *
+    1_enoch            ch6-7_watchers                  2/15  = 0.13  p=0.9844
+    1_enoch            ch94_woes                       6/9   = 0.67  p=0.0500
+    bahman_yasht       ch1_ahuramazda_oracle           1/2   = 0.50  p=0.5710
+    bahman_yasht       ch1_zoroaster_dream             1/2   = 0.50  p=0.5710
+    bahman_yasht       final_resurrection_oracle       3/14  = 0.21  p=0.9101
+    sibylline_oracles  book1_creation                  7/21  = 0.33  p=0.6251
+    sibylline_oracles  book1_prophecy_of_christ        8/17  = 0.47  p=0.2000
+    sibylline_oracles  book3_oracle_against_idolatry   6/12  = 0.50  p=0.2019
+    sibylline_oracles  book3_woe_babylon               2/6   = 0.33  p=0.6715
+    * p < 0.05   ** survives Bonferroni across the 12 pericopes (p < 0.0042)
+
+--- narrow model: predicted-label mix per condition ---
+pred_narrow         law-wisdom  narrative  prophetic
+condition                                           
+word_salad_uniform       0.614      0.013      0.373
+word_salad_freq          0.167      0.516      0.317
+verse_shuffle            0.213      0.462      0.325
+random_verse             0.266      0.414      0.320
+  noise floor (max over noise conditions): 0.373
+  KJV base rate (random_verse):            0.320
+  1_enoch            0.265 prophetic  (-0.108 vs floor, -0.055 vs base rate)
+  bahman_yasht       0.133 prophetic  (-0.240 vs floor, -0.187 vs base rate)
+  sibylline_oracles  0.322 prophetic  (-0.051 vs floor, +0.002 vs base rate)
+  hand-picked pericopes vs floor (one-sided exact binomial, H0: p = 0.373):
+    1_enoch            ch10_judgment                  11/25  = 0.44  p=0.3092
+    1_enoch            ch14_throne_vision              6/26  = 0.23  p=0.9601
+    1_enoch            ch1_theophany                   9/10  = 0.90  p=0.0009  **
+    1_enoch            ch6-7_watchers                  3/15  = 0.20  p=0.9572
+    1_enoch            ch94_woes                       4/9   = 0.44  p=0.4492
+    bahman_yasht       ch1_ahuramazda_oracle           1/2   = 0.50  p=0.6069
+    bahman_yasht       ch1_zoroaster_dream             0/2   = 0.00  p=1.0000
+    bahman_yasht       final_resurrection_oracle       4/14  = 0.29  p=0.8285
+    sibylline_oracles  book1_creation                  2/21  = 0.10  p=0.9993
+    sibylline_oracles  book1_prophecy_of_christ        8/17  = 0.47  p=0.2763
+    sibylline_oracles  book3_oracle_against_idolatry   2/12  = 0.17  p=0.9700
+    sibylline_oracles  book3_woe_babylon               2/6   = 0.33  p=0.7224
+    * p < 0.05   ** survives Bonferroni across the 12 pericopes (p < 0.0042)
+
+--- nostruct model: predicted-label mix per condition ---
+pred_nostruct       law-wisdom  narrative  prophetic
+condition                                           
+word_salad_uniform       0.895      0.080      0.025
+word_salad_freq          0.285      0.493      0.222
+verse_shuffle            0.222      0.552      0.226
+random_verse             0.220      0.547      0.233
+  noise floor (max over noise conditions): 0.226
+  KJV base rate (random_verse):            0.233
+  1_enoch            0.209 prophetic  (-0.017 vs floor, -0.024 vs base rate)
+  bahman_yasht       0.074 prophetic  (-0.152 vs floor, -0.159 vs base rate)
+  sibylline_oracles  0.282 prophetic  (+0.056 vs floor, +0.049 vs base rate)
+  hand-picked pericopes vs floor (one-sided exact binomial, H0: p = 0.226):
+    1_enoch            ch10_judgment                  10/25  = 0.40  p=0.0386  *
+    1_enoch            ch14_throne_vision              3/26  = 0.12  p=0.9535
+    1_enoch            ch1_theophany                   8/10  = 0.80  p=0.0002  **
+    1_enoch            ch6-7_watchers                  1/15  = 0.07  p=0.9786
+    1_enoch            ch94_woes                       4/9   = 0.44  p=0.1239
+    bahman_yasht       ch1_ahuramazda_oracle           1/2   = 0.50  p=0.4009
+    bahman_yasht       ch1_zoroaster_dream             0/2   = 0.00  p=1.0000
+    bahman_yasht       final_resurrection_oracle       3/14  = 0.21  p=0.6442
+    sibylline_oracles  book1_creation                  2/21  = 0.10  p=0.9671
+    sibylline_oracles  book1_prophecy_of_christ       10/17  = 0.59  p=0.0014  **
+    sibylline_oracles  book3_oracle_against_idolatry   1/12  = 0.08  p=0.9538
+    sibylline_oracles  book3_woe_babylon               1/6   = 0.17  p=0.7850
+    * p < 0.05   ** survives Bonferroni across the 12 pericopes (p < 0.0042)
+
+--- normttr model: predicted-label mix per condition ---
+pred_normttr        law-wisdom  narrative  prophetic
+condition                                           
+word_salad_uniform       0.293      0.433      0.274
+word_salad_freq          0.136      0.564      0.300
+verse_shuffle            0.218      0.480      0.302
+random_verse             0.233      0.479      0.288
+  noise floor (max over noise conditions): 0.302
+  KJV base rate (random_verse):            0.288
+  1_enoch            0.262 prophetic  (-0.040 vs floor, -0.026 vs base rate)
+  bahman_yasht       0.150 prophetic  (-0.152 vs floor, -0.138 vs base rate)
+  sibylline_oracles  0.373 prophetic  (+0.071 vs floor, +0.085 vs base rate)
+  hand-picked pericopes vs floor (one-sided exact binomial, H0: p = 0.302):
+    1_enoch            ch10_judgment                  11/25  = 0.44  p=0.1018
+    1_enoch            ch14_throne_vision              5/26  = 0.19  p=0.9296
+    1_enoch            ch1_theophany                   9/10  = 0.90  p=0.0002  **
+    1_enoch            ch6-7_watchers                  3/15  = 0.20  p=0.8765
+    1_enoch            ch94_woes                       5/9   = 0.56  p=0.1013
+    bahman_yasht       ch1_ahuramazda_oracle           1/2   = 0.50  p=0.5128
+    bahman_yasht       ch1_zoroaster_dream             0/2   = 0.00  p=1.0000
+    bahman_yasht       final_resurrection_oracle       4/14  = 0.29  p=0.6509
+    sibylline_oracles  book1_creation                  2/21  = 0.10  p=0.9947
+    sibylline_oracles  book1_prophecy_of_christ        9/17  = 0.53  p=0.0420  *
+    sibylline_oracles  book3_oracle_against_idolatry   2/12  = 0.17  p=0.9172
+    sibylline_oracles  book3_woe_babylon               2/6   = 0.33  p=0.5841
+    * p < 0.05   ** survives Bonferroni across the 12 pericopes (p < 0.0042)
+

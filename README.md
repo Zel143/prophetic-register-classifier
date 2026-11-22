@@ -45,6 +45,12 @@ set; Bahman Yasht increasingly reads as a genuine "doesn't transfer" case.
 The overall transfer question remains open — see `docs/classifier.md` for
 the full accounting.
 
+**Null control (2026-11-23):** `src/null_control.py` measures how often the models call
+random KJV word salad or shuffled verses "prophetic". The answer is 23-37%, not 0, and
+that floor now replaces 0% as the comparison point. The 1 Enoch theophany pericope clears
+it with Bonferroni correction. Under mechanical chunking, only Sibylline Oracles does. See
+[docs/null-control.md](docs/null-control.md).
+
 ## Project scope (v1)
 
 - **Language**: English only (KJV). Hebrew morphological features (e.g.

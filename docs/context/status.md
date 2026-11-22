@@ -3,7 +3,7 @@
 Snapshot of where the project stands. Update this as work progresses — it should always
 reflect the current state, not a history (see `decisions.md` for the log of past decisions).
 
-_Last updated: 2026-07-22_
+_Last updated: 2026-11-23_
 
 ## Summary
 
@@ -33,7 +33,9 @@ does not depend on it (excluding it *raised* the score). See `docs/classifier.md
 
 ## In progress
 
-- Nothing actively in flight. Candidate next steps, per `docs/classifier.md`: hand-picking
+- Nothing actively in flight. New candidate from the null control: add shuffle-sensitive
+  structural features (POS bigrams, clause-initial verb patterns), since the current
+  feature set can't tell a verse from its word-shuffled copy. Candidate next steps, per `docs/classifier.md`: hand-picking
   more transfer pericopes (the pericope evaluation is still 160 chunks / 12 pericopes,
   unchanged by the seed-set growth), especially prose-translated comparison material to
   test whether the prose/verse-form split holds beyond one corpus each; and digging into
@@ -44,6 +46,17 @@ does not depend on it (excluding it *raised* the score). See `docs/classifier.md
 
 ## Done
 
+- Null-control baseline (2026-11-23): `src/null_control.py` scores 1000 chunks in each of
+  four null conditions (uniform KJV word salad, frequency-weighted KJV word salad,
+  word-order-shuffled KJV verses, untouched KJV verses outside the seed set) with all four
+  saved models. The idea comes from TempleOS's random-word/random-passage oracle as a
+  machine test for apophenia. Results: the noise floor is 0.23-0.37 prophetic depending on
+  the model, not 0. Shuffled verses score the same as real verses, so at chunk level the
+  models read lexical profile, not syntax. Under mechanical chunking, 1 Enoch is at the
+  noise floor, Bahman Yasht is below it, and only Sibylline Oracles clears it (+5.6 to
+  +7.1pp, z of about 6-7, under nostruct/normttr). The 1 Enoch ch1_theophany pericope
+  (vv. 1-8) beats the floor with Bonferroni correction under narrow/nostruct/normttr, so
+  the headline result survives. Writeup in `docs/null-control.md`.
 - 1 Enoch 1:9 exclusion (2026-07-22): per the project owner's direction, 1 Enoch 1:9 (the
   verse Jude 1:14-15 quotes) is excluded from all analysis — stripped from mechanical
   chunking in `src/chunk_transfer_corpora.py` (with a one-match assertion) and cut from the

@@ -40,6 +40,17 @@ predictions and class probabilities for all three transfer corpora),
 `results/transfer_pericopes_predictions.csv` (hand-picked pericopes,
 sentence-chunked within each — see "Hand-picked pericopes" below for why).
 
+## Null-control baseline (2026-11-23): read every number below against the floor
+
+The prophetic shares in the sections below were originally read against 0%. Measured
+on KJV word salad and shuffled verses, the real noise floor is **0.345 / 0.373 / 0.226 /
+0.302** prophetic (full / narrow / nostruct / normttr). Against that floor, the
+mechanical-chunking results for 1 Enoch and Bahman Yasht are at or below noise. Sibylline
+Oracles clears it under nostruct and normttr. The ch1_theophany pericope clears it with
+Bonferroni correction under three of the four models. Shuffling word order doesn't change
+predictions, so the current features don't capture structure. Full writeup in
+[null-control.md](null-control.md).
+
 ## Grown seed set (2026-07-22): 345 → 510 verses, all four feature sets re-run
 
 The seed set grew from 345 to 510 verses (184 prophetic / 180 narrative /

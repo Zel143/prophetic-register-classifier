@@ -39,20 +39,32 @@ def predict_with(model_path, df):
     return preds
 
 
+STRUCT_SIDECAR = os.path.join(RESULTS_DIR, "transfer_pericope_chunks_struct_features.csv")
+MODELS = [
+    ("", "full"), ("_narrow", "narrow"), ("_nostruct", "nostruct"), ("_normttr", "normttr"),
+    ("_struct", "struct"), ("_structonly", "structonly"),
+]
+
+
 def main():
     df = pd.read_csv(CHUNKS_PATH)
     out = df[META_COLS].copy()
+    if os.path.exists(STRUCT_SIDECAR):
+        from structural_features import with_struct
+        df = with_struct(df, STRUCT_SIDECAR)
 
-    for suffix, label in [
-        ("", "full"), ("_narrow", "narrow"), ("_nostruct", "nostruct"), ("_normttr", "normttr"),
-    ]:
+    labels = []
+    for suffix, label in MODELS:
         model_path = os.path.join(RESULTS_DIR, f"classifier{suffix}.joblib")
+        if not os.path.exists(model_path):
+            continue
         out[f"pred_{label}"] = predict_with(model_path, df)
+        labels.append(label)
 
     out.to_csv(OUT_PATH, index=False)
     print(f"wrote {len(out)} chunk-level rows to {OUT_PATH}\n")
 
-    for label in ["full", "narrow", "nostruct", "normttr"]:
+    for label in labels:
         print(f"--- {label} model: predicted-label mix per pericope ---")
         summary = (
             out.groupby(["corpus", "pericope_id"])[f"pred_{label}"]

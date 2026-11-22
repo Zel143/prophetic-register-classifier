@@ -31,6 +31,20 @@ n_words and length-sensitive features stay in the training range:
   random_verse        real KJV verses (not in the seed set), untouched --
                       the TempleOS random-passage oracle; this one is a
                       base rate for the whole KJV, not noise
+  verse_flat          the *same* verses as verse_shuffle, lowercased and
+                      stripped of punctuation exactly as verse_shuffle is,
+                      but NOT shuffled. Added 2026-11-23 so verse_shuffle
+                      has a matched pair: the only difference between the
+                      two is word order. (Comparing verse_shuffle with
+                      random_verse changes word order, casing and
+                      punctuation all at once.) Built from the stored refs
+                      without drawing more random numbers, so the four
+                      original conditions are byte-identical to before.
+
+For each model, the report also gives *pair agreement*: the share of
+verse_shuffle chunks whose prediction matches the prediction for their
+own unshuffled verse_flat twin. A model that ignores word order scores
+1.0. The lower the score, the more the model's verdict depends on order.
 
 The first three should all sit near the floor if the classifier is
 reading register. random_verse is a different kind of number: the share
@@ -65,8 +79,12 @@ FEATURES_OUT = os.path.join(RESULTS_DIR, "null_control_features.csv")
 PRED_OUT = os.path.join(RESULTS_DIR, "null_control_predictions.csv")
 SUMMARY_OUT = os.path.join(RESULTS_DIR, "null_control_summary.txt")
 
-CONDITIONS = ["word_salad_uniform", "word_salad_freq", "verse_shuffle", "random_verse"]
-MODELS = [("", "full"), ("_narrow", "narrow"), ("_nostruct", "nostruct"), ("_normttr", "normttr")]
+CONDITIONS = ["word_salad_uniform", "word_salad_freq", "verse_shuffle", "verse_flat", "random_verse"]
+NOISE_CONDITIONS = ["word_salad_uniform", "word_salad_freq", "verse_shuffle"]
+MODELS = [
+    ("", "full"), ("_narrow", "narrow"), ("_nostruct", "nostruct"), ("_normttr", "normttr"),
+    ("_struct", "struct"), ("_structonly", "structonly"),
+]
 
 # Transfer results to read against the floor (mechanical chunking, prophetic
 # share, from results/transfer_predictions*.csv -- recomputed below, not
@@ -112,14 +130,19 @@ def build_chunks(n, seed):
     for i in range(n):
         k = rng.choice(lengths)
         rows.append(("word_salad_freq", i, "", " ".join(rng.choices(types, weights=type_weights, k=k))))
+    flat = []
     for i in range(n):
         ref, text = rng.choice(pool)
         words = WORD_RE.findall(text.lower())
+        flat.append((ref, " ".join(words)))
         rng.shuffle(words)
         rows.append(("verse_shuffle", i, ref, " ".join(words)))
     for i in range(n):
         ref, text = rng.choice(pool)
         rows.append(("random_verse", i, ref, text))
+    # No rng calls below this line: the conditions above stay identical.
+    for i, (ref, text) in enumerate(flat):
+        rows.append(("verse_flat", i, ref, text))
 
     return pd.DataFrame(rows, columns=["condition", "chunk_id", "source_ref", "text"])
 
@@ -135,7 +158,9 @@ def extract(df):
         ],
         axis=1,
     )
-    return pd.concat([df.reset_index(drop=True), feats], axis=1)
+    from structural_features import featurize_texts
+    struct = featurize_texts(texts)
+    return pd.concat([df.reset_index(drop=True), feats, struct], axis=1)
 
 
 def transfer_prophetic_share(label):
@@ -183,13 +208,15 @@ def main():
     feats.to_csv(FEATURES_OUT, index=False)
 
     out = df.copy()
-    for suffix, label in MODELS:
+    models = [(s, l) for s, l in MODELS
+              if os.path.exists(os.path.join(RESULTS_DIR, f"classifier{s}.joblib"))]
+    for suffix, label in models:
         bundle = joblib.load(os.path.join(RESULTS_DIR, f"classifier{suffix}.joblib"))
         out[f"pred_{label}"] = bundle["pipeline"].predict(feats[bundle["feature_cols"]].values)
     out.to_csv(PRED_OUT, index=False)
 
     lines = [f"Null-control baseline (n={args.n} per condition, seed={args.seed})", ""]
-    for _, label in MODELS:
+    for _, label in models:
         mix = (
             out.groupby("condition")[f"pred_{label}"]
             .value_counts(normalize=True).unstack().fillna(0)
@@ -197,9 +224,12 @@ def main():
         )
         lines.append(f"--- {label} model: predicted-label mix per condition ---")
         lines.append(mix.to_string())
+        sh = out[out.condition == "verse_shuffle"].sort_values("chunk_id")[f"pred_{label}"].values
+        fl = out[out.condition == "verse_flat"].sort_values("chunk_id")[f"pred_{label}"].values
+        lines.append(f"  pair agreement (shuffled vs. same verse unshuffled): {(sh == fl).mean():.3f}")
         tr = transfer_prophetic_share(label)
         if tr is not None:
-            floor = mix.loc[["word_salad_uniform", "word_salad_freq", "verse_shuffle"], "prophetic"].max()
+            floor = mix.loc[NOISE_CONDITIONS, "prophetic"].max()
             base = mix.loc["random_verse", "prophetic"]
             lines.append(f"  noise floor (max over noise conditions): {floor:.3f}")
             lines.append(f"  KJV base rate (random_verse):            {base:.3f}")

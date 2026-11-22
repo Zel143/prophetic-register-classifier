@@ -35,7 +35,14 @@ lexically-diverse/law-wisdom-like) is a raw-ttr sample-size artifact
 fixable by normalization, rather than a deeper genre-form difference.
 
 Usage:
-    python src/train_classifier.py [--features all|narrow|nostruct|normttr]
+    python src/train_classifier.py [--features all|narrow|nostruct|normttr|struct|structonly]
+
+--features struct is normttr plus the order-sensitive struct_* columns from
+src/structural_features.py (POS bigrams, clause-initial verb/conjunction/
+subject rates, verb-subject inversion, dependency distance). --features
+structonly is the struct_* columns alone. It tests whether word order by
+itself carries any register signal. Both need src/structural_features.py
+to have been run first. See docs/structural-features.md.
 """
 import argparse
 import os
@@ -54,6 +61,9 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RESULTS_DIR = os.path.join(REPO_ROOT, "results")
 SEED_FEATURES_PATH = os.path.join(RESULTS_DIR, "seed_set_features.csv")
 TRANSFER_FEATURES_PATH = os.path.join(RESULTS_DIR, "transfer_features.csv")
+SEED_STRUCT_PATH = os.path.join(RESULTS_DIR, "seed_set_struct_features.csv")
+TRANSFER_STRUCT_PATH = os.path.join(RESULTS_DIR, "transfer_struct_features.csv")
+STRUCT_MODES = ("struct", "structonly")
 
 SEED_META_COLS = ["book", "chapter", "verse", "ref", "label", "note", "text"]
 TRANSFER_META_COLS = ["corpus", "chunk_id", "text"]
@@ -96,6 +106,9 @@ NORMTTR_FEATURE_COLS = [
 
 def load_seed_data(mode):
     df = pd.read_csv(SEED_FEATURES_PATH)
+    if mode in STRUCT_MODES:
+        from structural_features import with_struct
+        df = with_struct(df, SEED_STRUCT_PATH)
     all_feature_cols = [c for c in df.columns if c not in SEED_META_COLS]
     if mode == "narrow":
         feature_cols = [
@@ -112,6 +125,13 @@ def load_seed_data(mode):
             c for c in all_feature_cols
             if c in NORMTTR_FEATURE_COLS or c.startswith(NARROW_FEATURE_PREFIXES)
         ]
+    elif mode == "struct":
+        feature_cols = [
+            c for c in all_feature_cols
+            if c in NORMTTR_FEATURE_COLS or c.startswith(NARROW_FEATURE_PREFIXES + ("struct_",))
+        ]
+    elif mode == "structonly":
+        feature_cols = [c for c in all_feature_cols if c.startswith("struct_")]
     else:
         feature_cols = all_feature_cols
     X = df[feature_cols].values
@@ -166,8 +186,11 @@ def top_features(pipe, feature_cols, n=8):
     return "\n".join(lines)
 
 
-def apply_to_transfer(pipe, feature_cols, pred_path):
+def apply_to_transfer(pipe, feature_cols, pred_path, mode="all"):
     df = pd.read_csv(TRANSFER_FEATURES_PATH)
+    if mode in STRUCT_MODES:
+        from structural_features import with_struct
+        df = with_struct(df, TRANSFER_STRUCT_PATH)
     X = df[feature_cols].values
     preds = pipe.predict(X)
     df_out = df[TRANSFER_META_COLS].copy()
@@ -187,7 +210,7 @@ def apply_to_transfer(pipe, feature_cols, pred_path):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--features", choices=["all", "narrow", "nostruct", "normttr"], default="all")
+    parser.add_argument("--features", choices=["all", "narrow", "nostruct", "normttr", "struct", "structonly"], default="all")
     args = parser.parse_args()
     suffix = "" if args.features == "all" else f"_{args.features}"
     model_path = os.path.join(RESULTS_DIR, f"classifier{suffix}.joblib")
@@ -227,7 +250,7 @@ def main():
     print(f"\nwrote eval summary to {eval_path}")
 
     print("\n--- Transfer-corpus predictions ---")
-    summary = apply_to_transfer(pipe, feature_cols, pred_path)
+    summary = apply_to_transfer(pipe, feature_cols, pred_path, args.features)
     print(summary)
     with open(eval_path, "a", encoding="utf-8") as f:
         f.write("\n\nTransfer-corpus predicted-label proportions:\n")

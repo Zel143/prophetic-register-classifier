@@ -51,6 +51,13 @@ that floor now replaces 0% as the comparison point. The 1 Enoch theophany perico
 it with Bonferroni correction. Under mechanical chunking, only Sibylline Oracles does. See
 [docs/null-control.md](docs/null-control.md).
 
+**Structural features (2026-11-23):** order-sensitive features (POS bigrams,
+clause-initial verb/conjunction patterns, verb-subject inversion) separate the three
+classes at macro-F1 0.565 *from structure alone*. So register has a measurable
+structural component in the canon. That signal doesn't yet transfer measurably, partly
+because a modern parser reads KJV poetic inversion like noise. See
+[docs/structural-features.md](docs/structural-features.md).
+
 ## Project scope (v1)
 
 - **Language**: English only (KJV). Hebrew morphological features (e.g.
@@ -90,6 +97,10 @@ copyrighted genre outline — see [docs/data-sources.md](docs/data-sources.md)):
 - Second-person direct-address density
 - Vocative / apostrophe frequency ("O Israel", "O daughter of Zion")
 - Poetic parallelism markers (v2, Hebrew-dependent — see MACULA note above)
+
+**Structural / order-sensitive** (added 2026-11-23, `src/structural_features.py`):
+- POS-bigram rates, clause-initial verb/conjunction/subject rates, verb-subject
+  inversion, first-verb position, dependency distance
 
 ## Comparison / transfer-test corpora
 

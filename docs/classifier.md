@@ -49,7 +49,8 @@ mechanical-chunking results for 1 Enoch and Bahman Yasht are at or below noise. 
 Oracles clears it under nostruct and normttr. The ch1_theophany pericope clears it with
 Bonferroni correction under three of the four models. Shuffling word order doesn't change
 predictions, so the current features don't capture structure. Full writeup in
-[null-control.md](null-control.md).
+[null-control.md](null-control.md). Order-sensitive features and the `struct` /
+`structonly` models are in [structural-features.md](structural-features.md).
 
 ## Grown seed set (2026-07-22): 345 → 510 verses, all four feature sets re-run
 

@@ -31,6 +31,7 @@ conditions only draw from verses that are **not** in the seed set.
 | `word_salad_freq` | random KJV tokens, weighted by frequency | noise that keeps the KJV's function-word profile |
 | `verse_shuffle` | real KJV verses with word order shuffled | right vocabulary, no syntax |
 | `random_verse` | real KJV verses, unchanged | KJV base rate (the TempleOS random-passage oracle) |
+| `verse_flat` | the same verses as `verse_shuffle`, processed the same way but not shuffled | matched pair for `verse_shuffle` (only word order differs) |
 
 The **noise floor** is the highest prophetic share among the three noise conditions.
 
@@ -43,15 +44,19 @@ The **noise floor** is the highest prophetic share among the three noise conditi
 | nostruct | 0.025 | 0.222 | 0.226 | 0.233 | **0.226** |
 | normttr | 0.274 | 0.300 | 0.302 | 0.288 | **0.302** |
 
-### Finding 1: syntax contributes almost nothing at the chunk level
+### Finding 1: word order matters only a little to the original feature sets
 
-`verse_shuffle` scores almost exactly like `random_verse` under every model, and so
-does frequency-weighted word salad. Scrambling word order, or replacing the verse
-with random KJV tokens altogether, barely changes the verdict. At the sentence-chunk
-level the classifier is reading a bag-of-words and frequency profile, not anything
-that depends on how the words are arranged. The README frames "register" as verb
-mood, address form and structure. The structural part of that is not what the model
-is using.
+`verse_shuffle`'s *overall* label mix is almost identical to the unshuffled verses'.
+**Correction (same day):** the first version of this doc compared shuffled verses with
+`random_verse`. That comparison changes casing and punctuation as well as word order, so
+it was confounded. A matched `verse_flat` condition fixes this: the same verses,
+lowercased and stripped of punctuation, but not shuffled. Against it, the four original
+models give the same prediction to 79-85% of shuffled/unshuffled pairs. So shuffling
+does flip 15-21% of individual verdicts, mostly through spaCy's POS tags and the
+sentence-initial imperative heuristic. It just doesn't shift the class totals. The
+original features are mostly, not entirely, insensitive to order.
+`structural-features.md` adds features that are sensitive to order: agreement drops to
+0.45-0.55.
 
 ### Finding 2: most mechanical-chunking transfer results sit at the noise floor
 
@@ -92,10 +97,9 @@ result holds up against a real null. That result already excludes 1 Enoch 1:9 (s
   prophetic share near 0.30 is the noise level, not weak evidence of transfer.
 - The real signal is narrow: one 1 Enoch pericope robustly, and Sibylline Oracles
   modestly. The "transfer is plausible" reading should be scoped to those cases.
-- Finding 1 points to a next step. Features that *cannot* survive shuffling, such
-  as clause-initial verb patterns, POS bigrams and sentence-position features,
-  would test the structural half of the register hypothesis. Right now nothing in
-  the feature set tests it.
+- Finding 1 pointed to the next step, which is now done: features that shuffling breaks
+  (POS bigrams, clause-initial verb patterns). See
+  [structural-features.md](structural-features.md).
 - The uniform-salad column is unstable across models (0.025 to 0.373). Uniform word
   types are mostly rare words, so the text is far outside the training distribution
   and each model extrapolates differently. The floor is therefore taken as the

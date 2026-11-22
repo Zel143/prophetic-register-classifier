@@ -5,6 +5,32 @@ alternatives were considered. Newest entries at the top.
 
 ---
 
+## 2026-11-23 — Added order-sensitive structural features as sidecars; archaic verbs modernized for parsing only
+
+**Decision:** Added `src/structural_features.py`, which writes sidecar CSVs
+(`*_struct_features.csv`) rather than regenerating the existing feature files, plus two
+new feature sets (`struct`, `structonly`). Archaic verb forms are modernized before
+spaCy parses the text. The structural features use the modernized text. The original
+features don't, and the stored text isn't changed. Also added a matched `verse_flat`
+condition to the null control and corrected its Finding 1.
+
+**Why:** The null control showed that the features couldn't test the structural half of
+the register hypothesis. Sidecars keep every earlier result reproducible: regenerating
+`seed_set_features.csv` under a different spaCy version could silently shift the
+existing POS columns. Modernization was needed because spaCy tags "saith" as ADP, which
+breaks the parse of the central prophetic formula. Checking -eth stems against the KJV's
+own vocabulary avoids mangling words like "teeth". The `verse_flat` pair was needed
+because the first shuffle comparison changed casing and punctuation along with order.
+
+**Alternatives considered:** All 289 UPOS bigrams (rejected: far too many columns for 510
+rows). Character- or word-level n-grams (rejected: these bring vocabulary back in, and
+vocabulary is exactly what was being separated out). A fourth "noise" class (rejected, as
+before). Excluding the shuffled condition from the struct model's floor because it
+inflates it (rejected: that inflation is the finding, and hiding it would flatter the
+model).
+
+---
+
 ## 2026-11-23 — Added a null-control baseline; transfer results are now read against a noise floor, not 0%
 
 **Decision:** Added `src/null_control.py` and `docs/null-control.md`. Transfer shares are

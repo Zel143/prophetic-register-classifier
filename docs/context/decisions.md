@@ -5,6 +5,54 @@ alternatives were considered. Newest entries at the top.
 
 ---
 
+## 2026-11-23 — Added order-sensitive structural features as sidecars; archaic verbs modernized for parsing only
+
+**Decision:** Added `src/structural_features.py`, which writes sidecar CSVs
+(`*_struct_features.csv`) rather than regenerating the existing feature files, plus two
+new feature sets (`struct`, `structonly`). Archaic verb forms are modernized before
+spaCy parses the text. The structural features use the modernized text. The original
+features don't, and the stored text isn't changed. Also added a matched `verse_flat`
+condition to the null control and corrected its Finding 1.
+
+**Why:** The null control showed that the features couldn't test the structural half of
+the register hypothesis. Sidecars keep every earlier result reproducible: regenerating
+`seed_set_features.csv` under a different spaCy version could silently shift the
+existing POS columns. Modernization was needed because spaCy tags "saith" as ADP, which
+breaks the parse of the central prophetic formula. Checking -eth stems against the KJV's
+own vocabulary avoids mangling words like "teeth". The `verse_flat` pair was needed
+because the first shuffle comparison changed casing and punctuation along with order.
+
+**Alternatives considered:** All 289 UPOS bigrams (rejected: far too many columns for 510
+rows). Character- or word-level n-grams (rejected: these bring vocabulary back in, and
+vocabulary is exactly what was being separated out). A fourth "noise" class (rejected, as
+before). Excluding the shuffled condition from the struct model's floor because it
+inflates it (rejected: that inflation is the finding, and hiding it would flatter the
+model).
+
+---
+
+## 2026-11-23 — Added a null-control baseline; transfer results are now read against a noise floor, not 0%
+
+**Decision:** Added `src/null_control.py` and `docs/null-control.md`. Transfer shares are
+now compared with each model's noise floor, defined as the max prophetic share across
+three noise conditions (uniform word salad, frequency-weighted word salad and shuffled
+verses), and with a KJV base rate from untouched random verses. Pericopes are tested with
+a one-sided exact binomial test against the floor, with Bonferroni correction across 12.
+
+**Why:** Every earlier result implicitly treated 0% as chance. Measured, the floor is
+0.23-0.37, so several "partial transfer" readings were at noise level. The idea came from
+TempleOS's random-word oracle, a well-known human case of finding prophecy in noise, used
+here as a machine test. The project still measures style only.
+
+**Alternatives considered:** Using 1/3 (uniform-prior chance) as the floor. Rejected:
+the classifier's priors and feature distributions aren't uniform, so 1/3 is no better a
+guess than 0. Taking the floor from frequency-weighted salad only. Rejected in favor of
+the max across conditions, which is more conservative. Retraining the models with a
+fourth "noise" class. Rejected: that would change the models being evaluated rather than
+measure them.
+
+---
+
 ## 2026-07-22 — Excluded 1 Enoch 1:9 from all analysis, at the project owner's direction
 
 **Decision:** 1 Enoch 1:9 — the verse Jude 1:14-15 quotes — is excluded from every

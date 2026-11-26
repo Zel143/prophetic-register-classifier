@@ -1,0 +1,61 @@
+Feature set: structonly (27 columns)
+Model: logistic_regression
+
+logistic_regression: macro-F1 0.565 (+/- 0.027)
+linear_svm: macro-F1 0.564 (+/- 0.028)
+
+Cross-validated classification report:
+              precision    recall  f1-score   support
+
+   prophetic       0.55      0.50      0.53       184
+   narrative       0.61      0.71      0.65       180
+  law-wisdom       0.54      0.50      0.52       146
+
+    accuracy                           0.57       510
+   macro avg       0.57      0.57      0.57       510
+weighted avg       0.57      0.57      0.57       510
+
+Confusion matrix:
+                 pred_prophetic  pred_narrative  pred_law-wisdom
+true_prophetic               92              49               43
+true_narrative               34             127               19
+true_law-wisdom              40              33               73
+
+Feature importance (final model, fit on all seed data):
+
+Top features for 'law-wisdom':
+  struct_clause_cc_initial       -0.426
+  struct_bg_SCONJ_PRON           -0.367
+  struct_first_verb_relpos       +0.326
+  struct_bg_CCONJ_PRON           -0.311
+  struct_vs_order                -0.298
+  struct_bg_PRON_NOUN            +0.291
+  struct_bg_NOUN_AUX             +0.281
+  struct_bg_PART_VERB            +0.234
+
+Top features for 'narrative':
+  struct_clause_cc_initial       +0.596
+  struct_bg_ADP_PROPN            +0.382
+  struct_clause_verb_initial     -0.378
+  struct_clauses_per_10w         +0.367
+  struct_bg_DET_PROPN            -0.362
+  struct_bg_NOUN_AUX             -0.356
+  struct_first_verb_relpos       -0.349
+  struct_bg_AUX_VERB             -0.319
+
+Top features for 'prophetic':
+  struct_bg_AUX_VERB             +0.449
+  struct_clauses_per_10w         -0.351
+  struct_bg_DET_PROPN            +0.333
+  struct_bg_PRON_VERB            +0.248
+  struct_bg_PRON_NOUN            -0.218
+  struct_bg_ADP_DET              -0.218
+  struct_vs_order                +0.204
+  struct_clause_verb_initial     +0.195
+
+Transfer-corpus predicted-label proportions:
+predicted_label    law-wisdom  narrative  prophetic
+corpus                                             
+1_enoch                 0.215      0.438      0.347
+bahman_yasht            0.485      0.234      0.281
+sibylline_oracles       0.339      0.376      0.285
